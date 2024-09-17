@@ -1,0 +1,132 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "artifacttype": {
+      "type": "String"
+    },
+    "body": {
+      "type": "String"
+    },
+    "emailto": {
+      "type": "String"
+    },
+    "subject": {
+      "type": "String"
+    },
+    "office365ConnectionId": {
+      "type": "String"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2016-06-01",
+      "name": "contractormarketing-sendemail",
+      "location": "uksouth",
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "artifacttype": {
+              "type": "String",
+              "defaultValue": "@parameters('artifacttype')"
+            },
+            "body": {
+              "type": "String",
+              "defaultValue": "@parameters('body')"
+            },
+            "emailto": {
+              "type": "String",
+              "defaultValue": "@parameters('emailto')"
+            },
+            "subject": {
+              "type": "String",
+              "defaultValue": "@parameters('subject')"
+            }
+          },
+          "triggers": {
+            "manual": {
+              "type": "Request",
+              "kind": "Http",
+              "inputs": {
+                "schema": {}
+              }
+            }
+          },
+          "actions": {
+            "Set_variable_subject": {
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "subject",
+                    "type": "String",
+                    "value": "@parameters('subject')"
+                  }
+                ]
+              }
+            },
+            "Set_variable_body": {
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "body",
+                    "type": "String",
+                    "value": "@parameters('body')"
+                  }
+                ]
+              }
+            },
+            "Set_variable_emailto": {
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "emailto",
+                    "type": "String",
+                    "value": "@parameters('emailto')"
+                  }
+                ]
+              }
+            },
+            "Send_an_email": {
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('office365ConnectionId')"
+                  }
+                },
+                "method": "post",
+                "path": "/v2/Mail",
+                "body": {
+                  "To": "@variables('emailto')",
+                  "Subject": "@variables('subject')",
+                  "Body": "<p>@{variables('body')}</p>"
+                }
+              },
+              "runAfter": {
+                "Set_variable_emailto": ["Succeeded"]
+              }
+            }
+          }
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "office365": {
+                "connectionId": "@parameters('office365ConnectionId')",
+                "connectionName": "office365",
+                "id": "/subscriptions/ad744a08-2411-4d78-b417-1f1c83f4f741/providers/Microsoft.Web/locations/uksouth/managedApis/office365"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
