@@ -15,7 +15,7 @@ This Azure Logic App workflow, named **Contractor Marketing - Send Email**, is d
    - **$connections**: Manages the Office365 API connection required for sending emails.
    - **artifacttype** (default: "usacontract"): A string parameter to define the type of artifact or contract.
    - **body** (default: "Looking for the new contract. Here is the CV. I look forward to the opportunity to speak with you soon. Regards, Erdem"): This is the email body that will be sent.
-   - **emailto** (default: "PurnimaM@vbeyond.com"): The recipient's email address.
+   - **emailto** (default: "PurnimaM@xxx.com"): The recipient's email address.
    - **subject** (default: "IT Contractor Erdem CV"): The subject line of the email.
 
 ### 3. **Actions**
